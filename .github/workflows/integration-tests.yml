@@ -132,6 +132,7 @@ jobs:
         uses: smartcontractkit/chainlink-github-actions/chainlink-testing-framework/cleanup@02c9ae5ec7f88250088bab88f14b4b043162b46d # v2.0.18
         with:
           triggered_by: ${{ env.TEST_TRIGGERED_BY }}
+          CGO_ENABLED: 1
 
   ### Solana Section
 
@@ -219,5 +220,6 @@ jobs:
         uses: smartcontractkit/chainlink-github-actions/chainlink-testing-framework/cleanup@02c9ae5ec7f88250088bab88f14b4b043162b46d # v2.0.18
         with:
           triggered_by: ${{ env.TEST_TRIGGERED_BY }}
+          CGO_ENABLED: 1
 
   ### End Solana Section
