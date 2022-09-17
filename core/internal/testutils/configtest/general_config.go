@@ -63,6 +63,7 @@ type GeneralConfigOverrides struct {
 	GlobalEvmGasBumpWei                     *big.Int
 	GlobalEvmGasFeeCapDefault               *big.Int
 	GlobalEvmGasLimitDefault                null.Int
+	GlobalEvmGasLimitMax                    null.Int
 	GlobalEvmGasLimitMultiplier             null.Float
 	GlobalEvmGasPriceDefault                *big.Int
 	GlobalEvmGasTipCapDefault               *big.Int
@@ -81,12 +82,14 @@ type GeneralConfigOverrides struct {
 	GlobalEvmMinGasPriceWei                 *big.Int
 	GlobalEvmNonceAutoSync                  null.Bool
 	GlobalEvmRPCDefaultBatchSize            null.Int
+	GlobalEvmUseForwarders                  null.Bool
 	GlobalFlagsContractAddress              null.String
 	GlobalGasEstimatorMode                  null.String
 	GlobalMinIncomingConfirmations          null.Int
 	GlobalMinimumContractPayment            *assets.Link
 	GlobalOCRObservationGracePeriod         time.Duration
 	KeeperCheckUpkeepGasPriceFeatureEnabled null.Bool
+	KeeperRegistryMaxPerformDataSize        null.Int
 	KeeperMaximumGracePeriod                null.Int
 	KeeperRegistrySyncInterval              *time.Duration
 	KeeperRegistrySyncUpkeepQueueSize       null.Int
@@ -106,6 +109,7 @@ type GeneralConfigOverrides struct {
 	LinkContractAddress                     null.String
 	OperatorFactoryAddress                  null.String
 	NodeNoNewHeadsThreshold                 *time.Duration
+	JobPipelineReaperInterval               *time.Duration
 
 	// Feature Flags
 	FeatureExternalInitiators null.Bool
@@ -440,6 +444,13 @@ func (c *TestGeneralConfig) KeeperRegistrySyncUpkeepQueueSize() uint32 {
 	return c.GeneralConfig.KeeperRegistrySyncUpkeepQueueSize()
 }
 
+func (c *TestGeneralConfig) KeeperRegistryMaxPerformDataSize() uint32 {
+	if c.Overrides.KeeperRegistryMaxPerformDataSize.Valid {
+		return uint32(c.Overrides.KeeperRegistryMaxPerformDataSize.Int64)
+	}
+	return c.GeneralConfig.KeeperRegistryMaxPerformDataSize()
+}
+
 // KeeperCheckUpkeepGasPriceFeatureEnabled overrides
 func (c *TestGeneralConfig) KeeperCheckUpkeepGasPriceFeatureEnabled() bool {
 	if c.Overrides.KeeperCheckUpkeepGasPriceFeatureEnabled.Valid {
@@ -567,6 +578,13 @@ func (c *TestGeneralConfig) GlobalEvmGasLimitDefault() (uint32, bool) {
 		return uint32(c.Overrides.GlobalEvmGasLimitDefault.Int64), true
 	}
 	return c.GeneralConfig.GlobalEvmGasLimitDefault()
+}
+
+func (c *TestGeneralConfig) GlobalEvmGasLimitMax() (uint32, bool) {
+	if c.Overrides.GlobalEvmGasLimitMax.Valid {
+		return uint32(c.Overrides.GlobalEvmGasLimitMax.Int64), true
+	}
+	return c.GeneralConfig.GlobalEvmGasLimitMax()
 }
 
 func (c *TestGeneralConfig) GlobalEvmGasLimitOCRJobType() (uint32, bool) {
@@ -815,4 +833,18 @@ func (c *TestGeneralConfig) GlobalNodeNoNewHeadsThreshold() (time.Duration, bool
 		return *c.Overrides.NodeNoNewHeadsThreshold, true
 	}
 	return c.GeneralConfig.GlobalNodeNoNewHeadsThreshold()
+}
+
+func (c *TestGeneralConfig) JobPipelineReaperInterval() time.Duration {
+	if c.Overrides.JobPipelineReaperInterval != nil {
+		return *c.Overrides.JobPipelineReaperInterval
+	}
+	return c.GeneralConfig.JobPipelineReaperInterval()
+}
+
+func (c *TestGeneralConfig) GlobalEvmUseForwarders() (bool, bool) {
+	if c.Overrides.GlobalEvmUseForwarders.Valid {
+		return c.Overrides.GlobalEvmUseForwarders.Bool, true
+	}
+	return c.GeneralConfig.GlobalEvmUseForwarders()
 }
