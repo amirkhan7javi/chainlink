@@ -21,6 +21,10 @@ as an estimated gas limit (up to `ETH_GAS_LIMIT_MAX`, with `1,000,000,000` defau
   - manually set the nonce for a key
   See [this PR](https://github.com/smartcontractkit/chainlink/pull/7406) for a screenshot example.
 
+### Changed
+
+- EIP1559 is now enabled by default on Goerli network
+
 ## 1.8.0 - 2022-09-01
 
 ### Added
