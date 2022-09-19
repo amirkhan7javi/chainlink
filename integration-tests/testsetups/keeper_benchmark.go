@@ -203,7 +203,18 @@ func (k *KeeperBenchmarkTest) Run() {
 // subscribeToUpkeepPerformedEvent subscribes to the event log for UpkeepPerformed event and
 // counts the number of times it was unsuccessful
 func (k *KeeperBenchmarkTest) subscribeToUpkeepPerformedEvent(doneChan chan bool, metricsReporter *testreporters.KeeperBenchmarkTestReporter, rIndex int) {
-	contractABI, err := ethereum.KeeperRegistryMetaData.GetAbi()
+	contractABI, err := ethereum.KeeperRegistry11MetaData.GetAbi()
+	switch k.Inputs.RegistryVersions[rIndex] {
+	case ethereum.RegistryVersion_1_0, ethereum.RegistryVersion_1_1:
+		contractABI, err = ethereum.KeeperRegistry11MetaData.GetAbi()
+	case ethereum.RegistryVersion_1_2:
+		contractABI, err = ethereum.KeeperRegistry12MetaData.GetAbi()
+	case ethereum.RegistryVersion_1_3:
+		contractABI, err = ethereum.KeeperRegistry13MetaData.GetAbi()
+	default:
+		contractABI, err = ethereum.KeeperRegistry13MetaData.GetAbi()
+	}
+
 	Expect(err).ShouldNot(HaveOccurred(), "Getting contract abi for registry shouldn't fail")
 	query := goeath.FilterQuery{
 		Addresses: []common.Address{common.HexToAddress(k.keeperRegistries[rIndex].Address())},
