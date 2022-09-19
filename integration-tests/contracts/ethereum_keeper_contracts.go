@@ -974,12 +974,12 @@ func NewKeeperConsumerBenchmarkRoundConfirmer(
 	}
 }
 
-// ReceiveBlock will query the latest Keeper round and check to see whether the round has confirmed
-func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock blockchain.NodeBlock) error {
-	if receivedBlock.NumberU64() <= o.lastBlockNum { // Uncle / reorg we won't count
+// ReceiveHeader will query the latest Keeper round and check to see whether the round has confirmed
+func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blockchain.NodeHeader) error {
+	if receivedHeader.Number.Uint64() <= o.lastBlockNum { // Uncle / reorg we won't count
 		return nil
 	}
-	o.lastBlockNum = receivedBlock.NumberU64()
+	o.lastBlockNum = receivedHeader.Number.Uint64()
 	// Increment block counters
 	o.blocksSinceSubscription++
 
@@ -993,7 +993,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 			return errors.New("upkeep count increased by more than 1 in a single block")
 		}
 		log.Info().
-			Uint64("Block Number", receivedBlock.NumberU64()).
+			Uint64("Block Number", receivedHeader.Number.Uint64()).
 			Str("Upkeep ID", o.upkeepID.String()).
 			Str("Contract Address", o.instance.Address()).
 			Int64("Upkeep Count", upkeepCount.Int64()).
@@ -1003,7 +1003,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 
 		if o.blocksSinceEligible > o.upkeepSLA {
 			log.Warn().
-				Uint64("Block Number", receivedBlock.NumberU64()).
+				Uint64("Block Number", receivedHeader.Number.Uint64()).
 				Str("Upkeep ID", o.upkeepID.String()).
 				Str("Contract Address", o.instance.Address()).
 				Int64("Blocks since eligible", o.blocksSinceEligible).
@@ -1026,7 +1026,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 			// First time this upkeep became eligible
 			o.countEligible++
 			log.Info().
-				Uint64("Block Number", receivedBlock.NumberU64()).
+				Uint64("Block Number", receivedHeader.Number.Uint64()).
 				Str("Upkeep ID", o.upkeepID.String()).
 				Str("Contract Address", o.instance.Address()).
 				Str("Registry Address", o.registry.Address()).
@@ -1039,7 +1039,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 		if o.blocksSinceEligible > 0 {
 			if o.blocksSinceEligible > o.upkeepSLA {
 				log.Warn().
-					Uint64("Block Number", receivedBlock.NumberU64()).
+					Uint64("Block Number", receivedHeader.Number.Uint64()).
 					Str("Upkeep ID", o.upkeepID.String()).
 					Str("Contract Address", o.instance.Address()).
 					Int64("Blocks since eligible", o.blocksSinceEligible).
@@ -1048,7 +1048,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 				o.countMissed++
 			} else {
 				log.Info().
-					Uint64("Block Number", receivedBlock.NumberU64()).
+					Uint64("Block Number", receivedHeader.Number.Uint64()).
 					Str("Upkeep ID", o.upkeepID.String()).
 					Str("Contract Address", o.instance.Address()).
 					Int64("Upkeep Count", upkeepCount.Int64()).
@@ -1060,7 +1060,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveBlock(receivedBlock block
 		}
 
 		log.Info().
-			Uint64("Block Number", receivedBlock.NumberU64()).
+			Uint64("Block Number", receivedHeader.Number.Uint64()).
 			Str("Upkeep ID", o.upkeepID.String()).
 			Str("Contract Address", o.instance.Address()).
 			Int64("Upkeeps Performed", upkeepCount.Int64()).
