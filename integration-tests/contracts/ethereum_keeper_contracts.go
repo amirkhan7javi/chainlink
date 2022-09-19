@@ -701,6 +701,16 @@ func (v *EthereumKeeperRegistry) ParseUpkeepPerformedLog(log *types.Log) (*Upkee
 			Success: parsedLog.Success,
 			From:    parsedLog.From,
 		}, nil
+	case ethereum.RegistryVersion_1_3:
+		parsedLog, err := v.registry1_3.ParseUpkeepPerformed(*log)
+		if err != nil {
+			return nil, err
+		}
+		return &UpkeepPerformedLog{
+			Id:      parsedLog.Id,
+			Success: parsedLog.Success,
+			From:    parsedLog.From,
+		}, nil
 	}
 	return nil, fmt.Errorf("keeper registry version %d is not supported", v.version)
 }
