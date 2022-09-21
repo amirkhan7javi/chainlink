@@ -17,6 +17,10 @@ import (
 	"github.com/smartcontractkit/chainlink/integration-tests/client"
 )
 
+var (
+	DashboardUrl = os.Getenv("GRAFANA_DASHBOARD_URL")
+)
+
 // KeeperBenchmarkTestReporter enables reporting on the keeper benchmark test
 type KeeperBenchmarkTestReporter struct {
 	Reports                        []KeeperBenchmarkTestReport `json:"reports"`
@@ -249,8 +253,7 @@ func (k *KeeperBenchmarkTestReporter) SendSlackNotification(slackClient *slack.C
 		return err
 	}
 
-	dashboardUrl := os.Getenv("GRAFANA_DASHBOARD_URL")
-	formattedDashboardUrl := fmt.Sprintf("%s&from=%d&to=%d&var-namespace=%s&var-cl_node=chainlink-0-0", dashboardUrl, k.Summary.StartTime, k.Summary.EndTime, k.namespace)
+	formattedDashboardUrl := fmt.Sprintf("%s&from=%d&to=%d&var-namespace=%s&var-cl_node=chainlink-0-0", DashboardUrl, k.Summary.StartTime, k.Summary.EndTime, k.namespace)
 	log.Info().Str("Dashboard", formattedDashboardUrl).Msg("Dashboard URL")
 
 	if err := testreporters.UploadSlackFile(slackClient, slack.FileUploadParameters{

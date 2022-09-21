@@ -4,6 +4,7 @@ package testsetups
 import (
 	"context"
 	"fmt"
+	"github.com/slack-go/slack"
 	"math/big"
 	"time"
 
@@ -124,7 +125,28 @@ func (k *KeeperBenchmarkTest) Setup(env *environment.Environment) {
 
 // Run runs the keeper benchmark test
 func (k *KeeperBenchmarkTest) Run() {
+	k.TestReporter.Summary.Load.TotalCheckGasPerBlock = int64(k.Inputs.NumberOfContracts) * k.Inputs.CheckGasToBurn
+	k.TestReporter.Summary.Load.TotalPerformGasPerBlock = int64((float64(k.Inputs.NumberOfContracts) / float64(k.Inputs.BlockInterval)) * float64(k.Inputs.PerformGasToBurn))
+	k.TestReporter.Summary.Load.AverageExpectedPerformsPerBlock = float64(k.Inputs.NumberOfContracts) / float64(k.Inputs.BlockInterval)
+	k.TestReporter.Summary.TestInputs = map[string]interface{}{
+		"NumberOfContracts":   k.Inputs.NumberOfContracts,
+		"BlockCountPerTurn":   k.Inputs.KeeperRegistrySettings.BlockCountPerTurn,
+		"CheckGasLimit":       k.Inputs.KeeperRegistrySettings.CheckGasLimit,
+		"MaxPerformGas":       k.Inputs.KeeperRegistrySettings.MaxPerformGas,
+		"CheckGasToBurn":      k.Inputs.CheckGasToBurn,
+		"PerformGasToBurn":    k.Inputs.PerformGasToBurn,
+		"BlockRange":          k.Inputs.BlockRange,
+		"BlockInterval":       k.Inputs.BlockInterval,
+		"UpkeepSLA":           k.Inputs.UpkeepSLA,
+		"FirstEligibleBuffer": k.Inputs.FirstEligibleBuffer,
+		"NumberOfRegistries":  len(k.keeperRegistries),
+	}
 	startTime := time.Now()
+	k.TestReporter.Summary.StartTime = startTime.UnixMilli() - (90 * time.Second.Milliseconds())
+	err := k.SendSlackNotification(nil)
+	if err != nil {
+		log.Warn().Msg("Sending test start slack notification failed")
+	}
 
 	for rIndex := range k.keeperRegistries {
 		// Send keeper jobs to registry and chainlink nodes
@@ -154,7 +176,7 @@ func (k *KeeperBenchmarkTest) Run() {
 	for rIndex := range k.keeperRegistries {
 		k.subscribeToUpkeepPerformedEvent(logSubscriptionStop, &k.TestReporter, rIndex)
 	}
-	err := k.chainClient.WaitForEvents()
+	err = k.chainClient.WaitForEvents()
 	Expect(err).ShouldNot(HaveOccurred(), "Error waiting for keeper subscriptions")
 	close(logSubscriptionStop)
 
@@ -164,23 +186,6 @@ func (k *KeeperBenchmarkTest) Run() {
 			log.Error().Err(err).Msg("Error reading transaction attempts from Chainlink Node")
 		}
 		k.TestReporter.AttemptedChainlinkTransactions = append(k.TestReporter.AttemptedChainlinkTransactions, txData)
-	}
-
-	k.TestReporter.Summary.Load.TotalCheckGasPerBlock = int64(k.Inputs.NumberOfContracts) * k.Inputs.CheckGasToBurn
-	k.TestReporter.Summary.Load.TotalPerformGasPerBlock = int64((float64(k.Inputs.NumberOfContracts) / float64(k.Inputs.BlockInterval)) * float64(k.Inputs.PerformGasToBurn))
-	k.TestReporter.Summary.Load.AverageExpectedPerformsPerBlock = float64(k.Inputs.NumberOfContracts) / float64(k.Inputs.BlockInterval)
-	k.TestReporter.Summary.TestInputs = map[string]interface{}{
-		"NumberOfContracts":   k.Inputs.NumberOfContracts,
-		"BlockCountPerTurn":   k.Inputs.KeeperRegistrySettings.BlockCountPerTurn,
-		"CheckGasLimit":       k.Inputs.KeeperRegistrySettings.CheckGasLimit,
-		"MaxPerformGas":       k.Inputs.KeeperRegistrySettings.MaxPerformGas,
-		"CheckGasToBurn":      k.Inputs.CheckGasToBurn,
-		"PerformGasToBurn":    k.Inputs.PerformGasToBurn,
-		"BlockRange":          k.Inputs.BlockRange,
-		"BlockInterval":       k.Inputs.BlockInterval,
-		"UpkeepSLA":           k.Inputs.UpkeepSLA,
-		"FirstEligibleBuffer": k.Inputs.FirstEligibleBuffer,
-		"NumberOfRegistries":  len(k.keeperRegistries),
 	}
 
 	k.TestReporter.Summary.Config.Chainlink, err = k.env.ResourcesSummary("app=chainlink-0")
@@ -194,7 +199,6 @@ func (k *KeeperBenchmarkTest) Run() {
 	}
 
 	endTime := time.Now()
-	k.TestReporter.Summary.StartTime = startTime.UnixMilli() - (90 * time.Second.Milliseconds())
 	k.TestReporter.Summary.EndTime = endTime.UnixMilli() + (30 * time.Second.Milliseconds())
 
 	log.Info().Str("Run Time", endTime.Sub(startTime).String()).Msg("Finished Keeper Benchmark Test")
@@ -295,4 +299,28 @@ func (k *KeeperBenchmarkTest) ensureInputValues() {
 	Expect(inputs.UpkeepSLA).ShouldNot(BeNil(), "You need to set UpkeepSLA")
 	Expect(inputs.FirstEligibleBuffer).ShouldNot(BeNil(), "You need to set FirstEligibleBuffer")
 	Expect(inputs.RegistryVersions[0]).ShouldNot(BeNil(), "You need to set RegistryVersion")
+}
+
+func (k *KeeperBenchmarkTest) SendSlackNotification(slackClient *slack.Client) error {
+	if slackClient == nil {
+		slackClient = slack.New(reportModel.SlackAPIKey)
+	}
+
+	headerText := ":white_check_mark: Keeper Benchmark Test Started :white_check_mark:"
+	formattedDashboardUrl := fmt.Sprintf("%s&from=%d&to=%d&var-namespace=%s&var-cl_node=chainlink-0-0", testreporters.DashboardUrl, k.TestReporter.Summary.StartTime, "now", k.env.Cfg.Namespace)
+	log.Info().Str("Dashboard", formattedDashboardUrl).Msg("Dashboard URL")
+
+	notificationBlocks := []slack.Block{}
+	notificationBlocks = append(notificationBlocks,
+		slack.NewHeaderBlock(slack.NewTextBlockObject("plain_text", headerText, true, false)))
+	notificationBlocks = append(notificationBlocks,
+		slack.NewContextBlock("context_block", slack.NewTextBlockObject("plain_text", k.env.Cfg.Namespace, false, false)))
+	notificationBlocks = append(notificationBlocks, slack.NewDividerBlock())
+	notificationBlocks = append(notificationBlocks, slack.NewSectionBlock(slack.NewTextBlockObject("mrkdwn",
+		fmt.Sprintf("<%s|Test Dashboard> \nNotifying <@%s>",
+			formattedDashboardUrl, reportModel.SlackUserID), false, true), nil, nil))
+
+	ts, err := reportModel.SendSlackMessage(slackClient, slack.MsgOptionBlocks(notificationBlocks...))
+	log.Debug().Str("ts", ts).Msg("Sent Slack Message")
+	return err
 }
