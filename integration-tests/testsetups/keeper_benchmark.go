@@ -272,7 +272,7 @@ func (k *KeeperBenchmarkTest) subscribeToUpkeepPerformedEvent(doneChan chan bool
 	}()
 }
 
-// Networks returns the networks that the test is running on
+// TearDownVals returns the networks that the test is running on
 func (k *KeeperBenchmarkTest) TearDownVals() (*environment.Environment, []*client.Chainlink, reportModel.TestReporter, blockchain.EVMClient) {
 	return k.env, k.chainlinkNodes, &k.TestReporter, k.chainClient
 }
@@ -307,7 +307,7 @@ func (k *KeeperBenchmarkTest) SendSlackNotification(slackClient *slack.Client) e
 	}
 
 	headerText := ":white_check_mark: Keeper Benchmark Test Started :white_check_mark:"
-	formattedDashboardUrl := fmt.Sprintf("%s&from=%d&to=%d&var-namespace=%s&var-cl_node=chainlink-0-0", testreporters.DashboardUrl, k.TestReporter.Summary.StartTime, "now", k.env.Cfg.Namespace)
+	formattedDashboardUrl := fmt.Sprintf("%s&from=%d&to=%s&var-namespace=%s&var-cl_node=chainlink-0-0", testreporters.DashboardUrl, k.TestReporter.Summary.StartTime, "now", k.env.Cfg.Namespace)
 	log.Info().Str("Dashboard", formattedDashboardUrl).Msg("Dashboard URL")
 
 	notificationBlocks := []slack.Block{}
