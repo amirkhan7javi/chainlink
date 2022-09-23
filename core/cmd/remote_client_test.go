@@ -566,6 +566,20 @@ func TestClient_GetConfiguration(t *testing.T) {
 	assert.Equal(t, cp.EnvPrinter.SessionTimeout, cfg.SessionTimeout())
 }
 
+func TestClient_ConfigV2(t *testing.T) {
+	t.Parallel()
+
+	app := startNewApplication(t)
+	client, r := app.NewClientAndRenderer()
+	// _ := app.GetConfig()
+
+	assert.NoError(t, client.GetConfiguration(cltest.EmptyCLIContext()))
+	require.Equal(t, 1, len(r.Renders))
+
+	// Output:
+	// BALLS
+}
+
 func TestClient_ConfigDump(t *testing.T) {
 	t.Parallel()
 

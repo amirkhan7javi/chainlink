@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/smartcontractkit/chainlink/core/config"
 	"github.com/smartcontractkit/chainlink/core/services/chainlink"
 	"github.com/smartcontractkit/chainlink/core/utils"
@@ -18,7 +19,8 @@ type ConfigController struct {
 
 // Show returns the whitelist of config variables
 // Example:
-//  "<application>/config"
+//
+//	"<application>/config"
 func (cc *ConfigController) Show(c *gin.Context) {
 	cw := config.NewConfigPrinter(cc.App.GetConfig())
 
@@ -38,13 +40,20 @@ func (c *ConfigV2Resource) SetID(string) error {
 }
 
 func (cc *ConfigController) Dump(c *gin.Context) {
-	tomlStr, err := cc.App.ConfigDump(c)
-	if err != nil {
-		cc.App.GetLogger().Errorw("Failed to dump TOML config", "err", err)
-		jsonAPIError(c, http.StatusInternalServerError, err)
-		return
+	cfg := cc.App.GetConfig()
+	_, isToml := cfg.(chainlink.TOMLConfig)
+	if isToml {
+		jsonAPIError(c, http.StatusUnprocessableEntity, errors.New("not supported when using TOML config"))
+	} else {
+		// Legacy config mode
+		userToml, err := cc.App.ConfigDump(c)
+		if err != nil {
+			cc.App.GetLogger().Errorw("Failed to dump TOML config", "err", err)
+			jsonAPIError(c, http.StatusInternalServerError, err)
+			return
+		}
+		jsonAPIResponse(c, ConfigV2Resource{userToml}, "config")
 	}
-	jsonAPIResponse(c, ConfigV2Resource{tomlStr}, "config")
 }
 
 type configPatchRequest struct {

@@ -431,7 +431,7 @@ func (cli *Client) GetConfiguration(c *clipkg.Context) (err error) {
 }
 
 func (cli *Client) configDumpStr() (string, error) {
-	resp, err := cli.HTTP.Get("/v2/config/v2")
+	resp, err := cli.HTTP.Get("/v2/config/dump-v1-as-v2")
 	if err != nil {
 		return "", cli.errorOut(err)
 	}
@@ -460,6 +460,27 @@ func (cli *Client) ConfigDump(c *clipkg.Context) (err error) {
 		return err
 	}
 	fmt.Print(configStr)
+	return nil
+}
+
+func (cli *Client) ConfigV2(c *clipkg.Context) (err error) {
+	resp, err := cli.HTTP.Get("/v2/config/v2")
+	if err != nil {
+		return cli.errorOut(err)
+	}
+	defer func() {
+		if cerr := resp.Body.Close(); cerr != nil {
+			err = multierr.Append(err, cerr)
+		}
+	}()
+	respPayload, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return cli.errorOut(err)
+	}
+	if resp.StatusCode != 200 {
+		return cli.errorOut(errors.Errorf("got HTTP status %d: %s", resp.StatusCode, respPayload))
+	}
+	fmt.Println(respPayload)
 	return nil
 }
 

@@ -28,6 +28,13 @@ import (
 	"github.com/smartcontractkit/chainlink/core/utils"
 )
 
+type TOMLConfig interface {
+	// RawUser will output the user-provided config as a string
+	RawUser() string
+	// RawEffective will output the current effective config as a string
+	RawEffective() string
+}
+
 // generalConfig is a wrapper to adapt Config to the config.GeneralConfig interface.
 type generalConfig struct {
 	inputTOML     string // user input, normalized via de/re-serialization
@@ -759,4 +766,14 @@ func (g *generalConfig) P2PV2ListenAddresses() []string {
 		}
 	}
 	return nil
+}
+
+// RawUser will output the user-provided config as a string
+func (c *generalConfig) RawUser() string {
+	return c.inputTOML
+}
+
+// RawEffective will output the current effective config as a string
+func (c *generalConfig) RawEffective() string {
+	return c.effectiveTOML
 }
