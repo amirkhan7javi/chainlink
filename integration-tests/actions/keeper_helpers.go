@@ -240,6 +240,15 @@ func DeployBenchmarkKeeperContracts(
 		upkeepsAddresses = append(upkeepsAddresses, upkeep.Address())
 	}
 	linkFunds := big.NewInt(0).Mul(big.NewInt(1e18), big.NewInt(blockRange/blockInterval))
+	gasPrice := big.NewInt(0).Mul(registrySettings.FallbackGasPrice, big.NewInt(2))
+	minLinkBalance := big.NewInt(0).
+		Add(big.NewInt(0).
+			Mul(big.NewInt(0).
+				Div(big.NewInt(0).Mul(gasPrice, big.NewInt(int64(upkeepGasLimit+80000))), registrySettings.FallbackLinkPrice),
+				big.NewInt(1e18+0)),
+			big.NewInt(0))
+
+	linkFunds = big.NewInt(0).Add(linkFunds, minLinkBalance)
 
 	upkeepIds := RegisterUpkeepContracts(linkToken, linkFunds, client, upkeepGasLimit, registry, registrar, numberOfContracts, upkeepsAddresses)
 
