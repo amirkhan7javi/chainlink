@@ -201,6 +201,11 @@ func (k *KeeperBenchmarkTest) Run() {
 	endTime := time.Now()
 	k.TestReporter.Summary.EndTime = endTime.UnixMilli() + (30 * time.Second.Milliseconds())
 
+	for rIndex := range k.keeperRegistries {
+		// Delete keeper jobs on chainlink nodes
+		actions.DeleteKeeperJobsWithId(k.chainlinkNodes, rIndex+1)
+	}
+
 	log.Info().Str("Run Time", endTime.Sub(startTime).String()).Msg("Finished Keeper Benchmark Test")
 }
 

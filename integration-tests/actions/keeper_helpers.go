@@ -74,6 +74,13 @@ func CreateKeeperJobsWithKeyIndex(chainlinkNodes []*client.Chainlink, keeperRegi
 	}
 }
 
+func DeleteKeeperJobsWithId(chainlinkNodes []*client.Chainlink, id int) {
+	for _, chainlinkNode := range chainlinkNodes {
+		err := chainlinkNode.MustDeleteJob(string(id))
+		Expect(err).ShouldNot(HaveOccurred(), "Deleting KeeperV2 Job shouldn't fail")
+	}
+}
+
 // DeployKeeperContracts deploys keeper registry and a number of basic upkeep contracts with an update interval of 5.
 // It returns the freshly deployed registry, registrar, consumers and the IDs of the upkeeps.
 func DeployKeeperContracts(
@@ -452,7 +459,17 @@ func DeployKeeperConsumersBenchmark(
 			big.NewInt(performGasToBurn),
 			big.NewInt(firstEligibleBuffer),
 		)
-		Expect(err).ShouldNot(HaveOccurred(), "Deploying KeeperConsumerBenchmark instance %d shouldn't fail", contractCount+1)
+		if err != nil {
+			log.Error().Err(err).Int("count", contractCount+1).Msg("Deploying KeeperConsumerBenchmark instance %d shouldn't fail")
+			keeperConsumerInstance, err = contractDeployer.DeployKeeperConsumerBenchmark(
+				big.NewInt(blockRange),
+				big.NewInt(blockInterval),
+				big.NewInt(checkGasToBurn),
+				big.NewInt(performGasToBurn),
+				big.NewInt(firstEligibleBuffer),
+			)
+		}
+		//Expect(err).ShouldNot(HaveOccurred(), "Deploying KeeperConsumerBenchmark instance %d shouldn't fail", contractCount+1)
 		upkeeps = append(upkeeps, keeperConsumerInstance)
 		log.Debug().
 			Str("Contract Address", keeperConsumerInstance.Address()).
