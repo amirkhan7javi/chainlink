@@ -103,6 +103,9 @@ type KeeperConsumerBenchmark interface {
 	GetUpkeepCount(ctx context.Context) (*big.Int, error)
 	SetCheckGasToBurn(ctx context.Context, gas *big.Int) error
 	SetPerformGasToBurn(ctx context.Context, gas *big.Int) error
+	Reset(ctx context.Context) error
+	SetSpread(ctx context.Context, testRange *big.Int, averageEligibilityCadence *big.Int) error
+	SetFirstEligibleBuffer(ctx context.Context, firstEligibleBuffer *big.Int) error
 }
 
 // KeeperRegistryOpts opts to deploy keeper registry version
@@ -1328,6 +1331,42 @@ func (v *EthereumKeeperConsumerBenchmark) SetPerformGasToBurn(ctx context.Contex
 		return err
 	}
 	tx, err := v.consumer.SetPerformGasToBurn(opts, gas)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+func (v *EthereumKeeperConsumerBenchmark) Reset(ctx context.Context) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.Reset(opts)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+func (v *EthereumKeeperConsumerBenchmark) SetSpread(ctx context.Context, testRange *big.Int, averageEligibilityCadence *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.SetSpread(opts, testRange, averageEligibilityCadence)
+	if err != nil {
+		return err
+	}
+	return v.client.ProcessTransaction(tx)
+}
+
+func (v *EthereumKeeperConsumerBenchmark) SetFirstEligibleBuffer(ctx context.Context, firstEligibleBuffer *big.Int) error {
+	opts, err := v.client.TransactionOpts(v.client.GetDefaultWallet())
+	if err != nil {
+		return err
+	}
+	tx, err := v.consumer.SetFirstEligibleBuffer(opts, firstEligibleBuffer)
 	if err != nil {
 		return err
 	}
