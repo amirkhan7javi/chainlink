@@ -36,7 +36,7 @@ func GinkgoSuite() {
 
 // ContractDeploymentInterval After how many contract actions to wait before starting any more
 // Example: When deploying 1000 contracts, stop every ContractDeploymentInterval have been deployed to wait before continuing
-var ContractDeploymentInterval = 200
+var ContractDeploymentInterval = 100
 
 // FundChainlinkNodes will fund all of the provided Chainlink nodes with a set amount of native currency
 func FundChainlinkNodes(
