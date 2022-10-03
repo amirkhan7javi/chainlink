@@ -1095,12 +1095,22 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blo
 	if (o.blocksSinceSubscription%noOfUpkeepsToReset == o.upkeepIndex%noOfUpkeepsToReset) && !o.upkeepReset {
 		err := o.instance.SetFirstEligibleBuffer(context.Background(), big.NewInt(1))
 		if err != nil {
-			log.Error().Err(err).Msg("Error setting first eligible buffer of consumer contract")
+			log.Error().
+				Err(err).
+				Uint64("Block Number", receivedHeader.Number.Uint64()).
+				Int64("Upkeep Index", o.upkeepIndex).
+				Str("Upkeep ID", o.upkeepID.String()).
+				Msg("Error setting first eligible buffer of consumer contract")
 			return err
 		}
 		err = o.instance.Reset(context.Background())
 		if err != nil {
-			log.Error().Err(err).Msg("Error resetting consumer contract")
+			log.Error().
+				Err(err).
+				Uint64("Block Number", receivedHeader.Number.Uint64()).
+				Int64("Upkeep Index", o.upkeepIndex).
+				Str("Upkeep ID", o.upkeepID.String()).
+				Msg("Error resetting consumer contract")
 			return err
 		}
 		o.upkeepReset = true

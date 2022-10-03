@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	. "github.com/onsi/gomega"
@@ -76,7 +77,7 @@ func CreateKeeperJobsWithKeyIndex(chainlinkNodes []*client.Chainlink, keeperRegi
 
 func DeleteKeeperJobsWithId(chainlinkNodes []*client.Chainlink, id int) {
 	for _, chainlinkNode := range chainlinkNodes {
-		err := chainlinkNode.MustDeleteJob(string(id))
+		err := chainlinkNode.MustDeleteJob(strconv.Itoa(id))
 		Expect(err).ShouldNot(HaveOccurred(), "Deleting KeeperV2 Job shouldn't fail")
 	}
 }
