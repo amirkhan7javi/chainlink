@@ -148,6 +148,8 @@ func (k *KeeperBenchmarkTest) Run() {
 		log.Warn().Msg("Sending test start slack notification failed")
 	}
 
+	rampUpBlocks := int64(k.Inputs.NumberOfContracts) / int64(k.TestReporter.Summary.Load.AverageExpectedPerformsPerBlock*2)
+
 	for rIndex := range k.keeperRegistries {
 		// Send keeper jobs to registry and chainlink nodes
 		actions.CreateKeeperJobsWithKeyIndex(k.chainlinkNodes, k.keeperRegistries[rIndex], rIndex)
@@ -157,7 +159,8 @@ func (k *KeeperBenchmarkTest) Run() {
 					keeperConsumer,
 					k.keeperRegistries[rIndex],
 					k.upkeepIDs[rIndex][index],
-					k.Inputs.BlockRange+k.Inputs.BlockInterval,
+					k.Inputs.BlockRange+k.Inputs.BlockInterval+rampUpBlocks,
+					rampUpBlocks,
 					k.Inputs.UpkeepSLA,
 					&k.TestReporter,
 					int64(index),
