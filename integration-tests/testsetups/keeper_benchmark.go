@@ -152,20 +152,6 @@ func (k *KeeperBenchmarkTest) Run() {
 		// Send keeper jobs to registry and chainlink nodes
 		actions.CreateKeeperJobsWithKeyIndex(k.chainlinkNodes, k.keeperRegistries[rIndex], rIndex)
 		for index, keeperConsumer := range k.keeperConsumerContracts[rIndex] {
-			err := keeperConsumer.SetFirstEligibleBuffer(context.Background(), big.NewInt(1))
-			if err != nil {
-				log.Error().Err(err).Msg("Error setting first eligible buffer of consumer contract")
-				return
-			}
-			err = k.chainClient.WaitForEvents()
-			Expect(err).ShouldNot(HaveOccurred(), "Failed waiting for setting first eligible buffer of consumer contract")
-			err = keeperConsumer.Reset(context.Background())
-			if err != nil {
-				log.Error().Err(err).Msg("Error resetting consumer contract")
-				return
-			}
-			err = k.chainClient.WaitForEvents()
-			Expect(err).ShouldNot(HaveOccurred(), "Failed waiting for resetting consumer contract")
 			k.chainClient.AddHeaderEventSubscription(fmt.Sprintf("Keeper Tracker %d %d", rIndex, index),
 				contracts.NewKeeperConsumerBenchmarkRoundConfirmer(
 					keeperConsumer,
@@ -174,6 +160,7 @@ func (k *KeeperBenchmarkTest) Run() {
 					k.Inputs.BlockRange+k.Inputs.BlockInterval,
 					k.Inputs.UpkeepSLA,
 					&k.TestReporter,
+					int64(index),
 				),
 			)
 		}

@@ -946,6 +946,7 @@ type KeeperConsumerBenchmarkRoundConfirmer struct {
 	blockRange      int64                                      // How many blocks to watch upkeeps for
 	upkeepSLA       int64                                      // SLA after which an upkeep is counted as 'missed'
 	metricsReporter *testreporters.KeeperBenchmarkTestReporter // Testreporter to track results
+	upkeepIndex     int64
 
 	// State variables, changes as we get blocks
 	blocksSinceSubscription int64   // How many blocks have passed since subscribing
@@ -955,6 +956,7 @@ type KeeperConsumerBenchmarkRoundConfirmer struct {
 	upkeepCount             int64   // The count of upkeeps done so far
 	allCheckDelays          []int64 // Tracks the amount of blocks missed before an upkeep since it became eligible
 	complete                bool
+	upkeepReset             bool
 }
 
 // NewKeeperConsumerBenchmarkRoundConfirmer provides a new instance of a KeeperConsumerBenchmarkRoundConfirmer
@@ -966,6 +968,7 @@ func NewKeeperConsumerBenchmarkRoundConfirmer(
 	blockRange int64,
 	upkeepSLA int64,
 	metricsReporter *testreporters.KeeperBenchmarkTestReporter,
+	upkeepIndex int64,
 ) *KeeperConsumerBenchmarkRoundConfirmer {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	return &KeeperConsumerBenchmarkRoundConfirmer{
@@ -984,6 +987,8 @@ func NewKeeperConsumerBenchmarkRoundConfirmer(
 		metricsReporter:         metricsReporter,
 		complete:                false,
 		lastBlockNum:            0,
+		upkeepIndex:             upkeepIndex,
+		upkeepReset:             false,
 	}
 }
 
@@ -1084,6 +1089,26 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blo
 		o.doneChan <- true
 		o.complete = true
 		return nil
+	}
+
+	noOfUpkeepsToReset := int64(o.metricsReporter.Summary.Load.AverageExpectedPerformsPerBlock) * 2
+	if (o.blocksSinceSubscription%noOfUpkeepsToReset == o.upkeepIndex%noOfUpkeepsToReset) && !o.upkeepReset {
+		err := o.instance.SetFirstEligibleBuffer(context.Background(), big.NewInt(1))
+		if err != nil {
+			log.Error().Err(err).Msg("Error setting first eligible buffer of consumer contract")
+			return err
+		}
+		err = o.instance.Reset(context.Background())
+		if err != nil {
+			log.Error().Err(err).Msg("Error resetting consumer contract")
+			return err
+		}
+		o.upkeepReset = true
+		log.Info().
+			Uint64("Block Number", receivedHeader.Number.Uint64()).
+			Int64("Upkeep Index", o.upkeepIndex).
+			Str("Upkeep ID", o.upkeepID.String()).
+			Msg("Upkeep Reset")
 	}
 	return nil
 }
