@@ -1091,8 +1091,9 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blo
 		return nil
 	}
 
-	noOfUpkeepsToReset := int64(o.metricsReporter.Summary.Load.AverageExpectedPerformsPerBlock) * 2
-	if (o.blocksSinceSubscription%noOfUpkeepsToReset == o.upkeepIndex%noOfUpkeepsToReset) && !o.upkeepReset {
+	numOfUpkeepsToReset := int64(o.metricsReporter.Summary.Load.AverageExpectedPerformsPerBlock) * 2
+	numOfBlocksToReset := o.metricsReporter.Summary.TestInputs["BlockRange"].(int64) / numOfUpkeepsToReset
+	if (o.blocksSinceSubscription%numOfBlocksToReset == o.upkeepIndex%numOfBlocksToReset) && !o.upkeepReset {
 		err := o.instance.SetFirstEligibleBuffer(context.Background(), big.NewInt(1))
 		if err != nil {
 			log.Error().
