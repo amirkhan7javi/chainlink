@@ -55,6 +55,8 @@ type KeeperBenchmarkTestInputs struct {
 	UpkeepSLA              int64                             // SLA in number of blocks for an upkeep to be performed once it becomes eligible
 	FirstEligibleBuffer    int64                             // How many blocks to add to randomised first eligible block, set to 0 to disable randomised first eligible block
 	RegistryVersions       []ethereum.KeeperRegistryVersion  // Registry version to use
+	PreDeployedConsumers   []string                          // PreDeployed consumer contracts to re-use in test
+	ResetUpkeeps           bool                              // Set to true to reset predeployedContracts first
 }
 
 // NewKeeperBenchmarkTest prepares a new keeper benchmark test to be run
@@ -117,6 +119,8 @@ func (k *KeeperBenchmarkTest) Setup(env *environment.Environment) {
 			inputs.CheckGasToBurn,
 			inputs.PerformGasToBurn,
 			inputs.FirstEligibleBuffer,
+			inputs.PreDeployedConsumers,
+			inputs.ResetUpkeeps,
 		)
 	}
 

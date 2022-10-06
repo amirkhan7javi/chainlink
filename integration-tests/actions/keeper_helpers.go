@@ -2,6 +2,7 @@ package actions
 
 //revive:disable:dot-imports
 import (
+	"context"
 	"fmt"
 	"math"
 	"math/big"
@@ -209,6 +210,8 @@ func DeployBenchmarkKeeperContracts(
 	checkGasToBurn, // How much gas should be burned on checkUpkeep() calls
 	performGasToBurn, // How much gas should be burned on performUpkeep() calls
 	firstEligibleBuffer int64, // How many blocks to add to randomised first eligible block, set to 0 to disable randomised first eligible block
+	predeployedContracts []string, // Array of addresses of predeployed consumer addresses to load
+	resetUpkeeps bool, // Set to true to reset predeployedContracts
 ) (contracts.KeeperRegistry, []contracts.KeeperConsumerBenchmark, []*big.Int) {
 	ef, err := contractDeployer.DeployMockETHLINKFeed(big.NewInt(2e18))
 	Expect(err).ShouldNot(HaveOccurred(), "Deploying mock ETH-Link feed shouldn't fail")
@@ -241,7 +244,7 @@ func DeployBenchmarkKeeperContracts(
 	}
 	registrar := DeployKeeperRegistrar(linkToken, registrarSettings, contractDeployer, client, registry)
 
-	upkeeps := DeployKeeperConsumersBenchmark(contractDeployer, client, numberOfContracts, blockRange, blockInterval, checkGasToBurn, performGasToBurn, firstEligibleBuffer)
+	upkeeps := DeployKeeperConsumersBenchmark(contractDeployer, client, numberOfContracts, blockRange, blockInterval, checkGasToBurn, performGasToBurn, firstEligibleBuffer, predeployedContracts, resetUpkeeps)
 
 	upkeepsAddresses := []string{}
 	for _, upkeep := range upkeeps {
@@ -448,8 +451,33 @@ func DeployKeeperConsumersBenchmark(
 	checkGasToBurn, // How much gas should be burned on checkUpkeep() calls
 	performGasToBurn, // How much gas should be burned on performUpkeep() calls
 	firstEligibleBuffer int64, // How many blocks to add to randomised first eligible block
+	predeployedContracts []string,
+	resetUpkeeps bool,
 ) []contracts.KeeperConsumerBenchmark {
 	upkeeps := make([]contracts.KeeperConsumerBenchmark, 0)
+
+	if len(predeployedContracts) > 0 {
+		contractLoader, err := contracts.NewContractLoader(client)
+		if err != nil {
+			log.Error().Err(err).Msg("Loading Contract Loader shouldn't fail")
+		}
+		for count, address := range predeployedContracts {
+			keeperConsumerInstance, err := contractLoader.LoadKeeperConsumerBenchmark(common.HexToAddress(address))
+			if err != nil {
+				log.Error().Err(err).Int("count", count+1).Msg("Loading KeeperConsumerBenchmark instance shouldn't fail")
+			}
+			upkeeps = append(upkeeps, keeperConsumerInstance)
+		}
+
+		if resetUpkeeps {
+			for _, upkeep := range upkeeps {
+				upkeep.SetFirstEligibleBuffer(context.Background(), big.NewInt(10000))
+				upkeep.SetSpread(context.Background(), big.NewInt(blockRange), big.NewInt(blockInterval))
+				upkeep.Reset(context.Background())
+			}
+		}
+		return upkeeps
+	}
 
 	for contractCount := 0; contractCount < numberOfContracts; contractCount++ {
 		// Deploy consumer
