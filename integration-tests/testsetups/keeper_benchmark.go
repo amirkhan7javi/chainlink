@@ -163,7 +163,7 @@ func (k *KeeperBenchmarkTest) Run() {
 					keeperConsumer,
 					k.keeperRegistries[rIndex],
 					k.upkeepIDs[rIndex][index],
-					k.Inputs.BlockRange+k.Inputs.BlockInterval+rampUpBlocks,
+					k.Inputs.BlockRange+rampUpBlocks,
 					rampUpBlocks,
 					k.Inputs.UpkeepSLA,
 					&k.TestReporter,

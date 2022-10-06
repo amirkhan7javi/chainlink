@@ -942,6 +942,7 @@ type KeeperConsumerBenchmarkRoundConfirmer struct {
 	context  context.Context
 	cancel   context.CancelFunc
 
+	firstBlockNum   uint64                                     // Records the number of the first block that came in
 	lastBlockNum    uint64                                     // Records the number of the last block that came in
 	blockRange      int64                                      // How many blocks to watch upkeeps for
 	upkeepSLA       int64                                      // SLA after which an upkeep is counted as 'missed'
@@ -992,6 +993,7 @@ func NewKeeperConsumerBenchmarkRoundConfirmer(
 		upkeepIndex:             upkeepIndex,
 		upkeepReset:             false,
 		rampUpBlocks:            rampUpBlocks,
+		firstBlockNum:           0,
 	}
 }
 
@@ -999,6 +1001,9 @@ func NewKeeperConsumerBenchmarkRoundConfirmer(
 func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blockchain.NodeHeader) error {
 	if receivedHeader.Number.Uint64() <= o.lastBlockNum { // Uncle / reorg we won't count
 		return nil
+	}
+	if o.firstBlockNum == 0 {
+		o.firstBlockNum = receivedHeader.Number.Uint64()
 	}
 	o.lastBlockNum = receivedHeader.Number.Uint64()
 	// Increment block counters
@@ -1056,7 +1061,7 @@ func (o *KeeperConsumerBenchmarkRoundConfirmer) ReceiveHeader(receivedHeader blo
 		o.blocksSinceEligible++
 	}
 
-	if o.blocksSinceSubscription >= o.blockRange {
+	if o.blocksSinceSubscription >= o.blockRange || int64(o.lastBlockNum-o.firstBlockNum) >= o.blockRange {
 		if o.blocksSinceEligible > 0 {
 			if o.blocksSinceEligible > o.upkeepSLA {
 				log.Warn().
