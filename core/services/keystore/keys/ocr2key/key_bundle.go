@@ -15,7 +15,7 @@ import (
 	"github.com/smartcontractkit/chainlink/core/store/models"
 )
 
-// nolint
+//nolint:all
 type KeyBundle interface {
 	// OnchainKeyring is used for signing reports (groups of observations, verified onchain)
 	ocrtypes.OnchainKeyring
@@ -94,7 +94,7 @@ func (kb keyBundleBase) GoString() string {
 	return kb.String()
 }
 
-// nolint
+//nolint:all
 type Raw []byte
 
 func (raw Raw) Key() (kb KeyBundle) {

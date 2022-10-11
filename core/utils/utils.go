@@ -824,7 +824,7 @@ type StartStopOnce struct {
 // StartStopOnceState holds the state for StartStopOnce
 type StartStopOnceState int32
 
-// nolint
+//nolint:all
 const (
 	StartStopOnce_Unstarted StartStopOnceState = iota
 	StartStopOnce_Started

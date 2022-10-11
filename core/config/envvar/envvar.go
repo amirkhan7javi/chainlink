@@ -13,7 +13,7 @@ import (
 	"github.com/smartcontractkit/chainlink/core/config/parse"
 )
 
-// nolint
+//nolint:all
 var (
 	AdvisoryLockID                    = NewInt64("AdvisoryLockID")
 	AuthenticatedRateLimitPeriod      = NewDuration("AuthenticatedRateLimitPeriod")

@@ -69,7 +69,7 @@ func ensureMigrated(db *sql.DB, lggr logger.Logger) {
 	}
 
 	// insert records for existing migrations
-	//nolint
+	//nolint:all
 	sql := fmt.Sprintf(`INSERT INTO %s (version_id, is_applied) VALUES ($1, true);`, goose.TableName())
 	err = pg.SqlTransaction(context.Background(), db, lggr, func(tx *sqlx.Tx) error {
 		for _, name := range names {

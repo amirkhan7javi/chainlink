@@ -33,7 +33,7 @@ import (
 
 //go:generate mockery --name GeneralConfig --output ./mocks/ --case=underscore
 
-// nolint
+//nolint:all
 var (
 	ErrEnvUnset   = errors.New("env var unset")
 	ErrEnvInvalid = errors.New("env var invalid")
