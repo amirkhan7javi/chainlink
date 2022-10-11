@@ -1,9 +1,8 @@
 package ocr
 
 import (
-	ocrtypes "github.com/smartcontractkit/libocr/offchainreporting/types"
-
 	"github.com/smartcontractkit/chainlink/core/services/job"
+	ocrtypes "github.com/smartcontractkit/libocr/offchainreporting/types"
 )
 
 // Config contains OCR configurations for a job.

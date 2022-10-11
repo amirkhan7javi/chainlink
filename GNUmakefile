@@ -80,10 +80,8 @@ testdb-user-only: ## Prepares the test database with user only.
 
 # Format for CI
 .PHONY: presubmit
-presubmit: ## Format go files and imports.
-	goimports -w ./core
-	gofmt -w ./core
-	go mod tidy
+presubmit: gomodtidy ## Format go files and imports.
+	goimports -w -local github.com/smartcontractkit/chainlink .
 
 .PHONY: mockery
 mockery: $(mockery) ## Install mockery.

@@ -4,13 +4,10 @@ package mocks
 
 import (
 	context "context"
-
-	assets "github.com/smartcontractkit/chainlink/core/assets"
-
-	gas "github.com/smartcontractkit/chainlink/core/chains/evm/gas"
-
 	mock "github.com/stretchr/testify/mock"
 
+	assets "github.com/smartcontractkit/chainlink/core/assets"
+	gas "github.com/smartcontractkit/chainlink/core/chains/evm/gas"
 	types "github.com/smartcontractkit/chainlink/core/chains/evm/types"
 )
 
