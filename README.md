@@ -146,11 +146,11 @@ For more information on creating and using external adapters, please see our [ex
 
 2. Install [gencodec](https://github.com/fjl/gencodec) and [jq](https://stedolan.github.io/jq/download/) to be able to run `go generate ./...` and `make abigen`
 
-3. Install mockery
+3. Run mockery
 
 `make mockery`
 
-Using the `make` command will install the correct version.
+Using the `make mockery_install` command will install the correct version.
 
 4. Build contracts:
 
