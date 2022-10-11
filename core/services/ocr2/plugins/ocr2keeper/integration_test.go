@@ -54,7 +54,7 @@ var (
 	oneHunEth = big.NewInt(0).Mul(oneEth, big.NewInt(100))
 
 	payload1 = common.Hex2Bytes("1234")
-	payload2 = common.Hex2Bytes("ABCD")
+	//payload2 = common.Hex2Bytes("ABCD")
 )
 
 func deployKeeper20Registry(

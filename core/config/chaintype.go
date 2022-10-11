@@ -8,7 +8,6 @@ import (
 // ChainType denotes the chain or network to work with
 type ChainType string
 
-//nolint:all
 const (
 	ChainArbitrum ChainType = "arbitrum"
 	ChainMetis    ChainType = "metis"

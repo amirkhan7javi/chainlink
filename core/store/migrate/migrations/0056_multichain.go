@@ -47,7 +47,6 @@ DROP TABLE nodes;
 DROP TABLE evm_chains;
 `
 
-//nolint:all
 func Up56(tx *sql.Tx) error {
 	if _, err := tx.Exec(up56); err != nil {
 		return err
@@ -74,7 +73,6 @@ func Up56(tx *sql.Tx) error {
 	return nil
 }
 
-//nolint:all
 func Down56(tx *sql.Tx) error {
 	_, err := tx.Exec(down56)
 	if err != nil {
