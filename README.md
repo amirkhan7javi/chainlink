@@ -150,7 +150,7 @@ For more information on creating and using external adapters, please see our [ex
 
 `make mockery`
 
-Using the `make mockery_install` command will install the correct version.
+Using the `make mockery` command will install the correct version.
 
 4. Build contracts:
 
