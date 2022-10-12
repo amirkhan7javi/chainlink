@@ -81,4 +81,6 @@ issues:
       text: "^G404:"
       linters:
         - gosec
-    - path: mocks
+    - path: "(^|/)mocks($|/)"
+      linters:
+        - all

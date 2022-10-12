@@ -28,7 +28,7 @@ gomod: ## Ensure chainlink's go dependencies are installed.
 
 gomodtidy: ## Run go mod tidy on all modules.
 	go mod tidy
-	cd ./integration-tests && go mod tidy
+	cd ./integration-tests && go mod tidy && cd ..
 
 .PHONY: install-chainlink
 install-chainlink: chainlink ## Install the chainlink binary.
@@ -82,12 +82,12 @@ testdb-user-only: ## Prepares the test database with user only.
 presubmit: gomodtidy ## Format go files and imports.
 	goimports -w -local github.com/smartcontractkit/chainlink .
 
-mockery_install: $(mockery) ## Install mockery.
+.PHONY: mockery
+mockery: $(mockery) ## Install mockery.
 	go install github.com/vektra/mockery/v2@v2.14.0
 
-.PHONY: mockery
-mockery: mockery_install
-	mockery --all
+generate: mockery
+	go generate ./...
 
 .PHONY: telemetry-protobuf
 telemetry-protobuf: $(telemetry-protobuf) ## Generate telemetry protocol buffers.
