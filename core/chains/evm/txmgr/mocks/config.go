@@ -4,6 +4,7 @@ package mocks
 
 import (
 	time "time"
+
 	common "github.com/ethereum/go-ethereum/common"
 	mock "github.com/stretchr/testify/mock"
 

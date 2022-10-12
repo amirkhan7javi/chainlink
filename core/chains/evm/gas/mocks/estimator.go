@@ -4,6 +4,7 @@ package mocks
 
 import (
 	context "context"
+
 	mock "github.com/stretchr/testify/mock"
 
 	assets "github.com/smartcontractkit/chainlink/core/assets"
