@@ -167,6 +167,8 @@ func (k *KeeperBenchmarkTest) Run() {
 		// Reset upkeeps so that they become eligible gradually after the test starts
 		actions.ResetUpkeeps(contractDeployer, k.chainClient, inputs.NumberOfContracts, inputs.BlockRange, inputs.BlockInterval, inputs.CheckGasToBurn,
 			inputs.PerformGasToBurn, inputs.FirstEligibleBuffer, inputs.PreDeployedConsumers, inputs.UpkeepResetterAddress)
+		actions.ResetUpkeeps(contractDeployer, k.chainClient, 100, inputs.BlockRange, inputs.BlockInterval, 25000000,
+			inputs.PerformGasToBurn, inputs.FirstEligibleBuffer, inputs.PreDeployedConsumers, inputs.UpkeepResetterAddress)
 		for index, keeperConsumer := range k.keeperConsumerContracts[rIndex] {
 			k.chainClient.AddHeaderEventSubscription(fmt.Sprintf("Keeper Tracker %d %d", rIndex, index),
 				contracts.NewKeeperConsumerBenchmarkRoundConfirmer(
