@@ -349,8 +349,7 @@ func createVRFJobs(
 		jb, err := vrf.ValidatedVRFSpec(s)
 		t.Log(jb.VRFSpec.PublicKey.MustHash(), vrfkey.PublicKey.MustHash())
 		require.NoError(t, err)
-		err = app.JobSpawner().CreateJob(&jb)
-		require.NoError(t, err)
+		require.NoError(t, app.JobSpawner().CreateJob(&jb))
 		registerProvingKeyHelper(t, uni, vrfkey)
 		jobs = append(jobs, jb)
 	}
@@ -1642,8 +1641,7 @@ func TestIntegrationVRFV2(t *testing.T) {
 	}).Toml()
 	jb, err := vrf.ValidatedVRFSpec(s)
 	require.NoError(t, err)
-	err = app.JobSpawner().CreateJob(&jb)
-	require.NoError(t, err)
+	require.NoError(t, app.JobSpawner().CreateJob(&jb))
 
 	registerProvingKeyHelper(t, uni, vrfkey)
 
@@ -1823,8 +1821,7 @@ func TestMaliciousConsumer(t *testing.T) {
 	}).Toml()
 	jb, err := vrf.ValidatedVRFSpec(s)
 	require.NoError(t, err)
-	err = app.JobSpawner().CreateJob(&jb)
-	require.NoError(t, err)
+	require.NoError(t, app.JobSpawner().CreateJob(&jb))
 	time.Sleep(1 * time.Second)
 
 	// Register a proving key associated with the VRF job.
