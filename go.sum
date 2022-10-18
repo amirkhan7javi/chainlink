@@ -1594,6 +1594,8 @@ github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018063544-a5e
 github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018063544-a5ed95d4f069/go.mod h1:hAuPRorw2q9AdNMbhWY9/5bUvcpe8uwIM4nGu1RlMsk=
 github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018074835-20cb683b8d28 h1:0b6KEhH0ZwrtF4mKEGC3vZfR5hhtvBpt+o/P35jXsvY=
 github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018074835-20cb683b8d28/go.mod h1:hAuPRorw2q9AdNMbhWY9/5bUvcpe8uwIM4nGu1RlMsk=
+github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018134703-e5fa942986a8 h1:7oTPH4/5C/VT8ioEVuUX2Er12iWVCiHIxqWQbqCcr7E=
+github.com/smartcontractkit/chainlink-starknet/relayer v0.0.0-20221018134703-e5fa942986a8/go.mod h1:ul19KeUkgowZsktSDQsIFcDSaa5jLcw3g+PsJdVLn90=
 github.com/smartcontractkit/chainlink-terra v0.1.4-0.20220930034731-ef9eb53de886 h1:VVB/jdEBD9O01uOPvONEWeUVJr2/crLjVVCfTl1fOLM=
 github.com/smartcontractkit/chainlink-terra v0.1.4-0.20220930034731-ef9eb53de886/go.mod h1:4b37Z1FVslnJ1TLo1r1XtuB9ym1uF/minZFcZlIBAV0=
 github.com/smartcontractkit/libocr v0.0.0-20220812191430-db92a9fdaa52 h1:Nac1UCKJwt0AY15bAaorscflOcBs/FnmO7NoCh8Tons=
