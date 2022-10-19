@@ -15,7 +15,7 @@ require (
 	github.com/slack-go/slack v0.11.3
 	github.com/smartcontractkit/chainlink v1.8.0
 	github.com/smartcontractkit/chainlink-env v0.2.41
-	github.com/smartcontractkit/chainlink-testing-framework v1.7.1
+	github.com/smartcontractkit/chainlink-testing-framework v1.7.3-0.20221018155930-66f71dd0e8f5
 	github.com/smartcontractkit/libocr v0.0.0-20220812191430-db92a9fdaa52
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/atomic v1.9.0
@@ -121,7 +121,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
