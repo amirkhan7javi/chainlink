@@ -536,13 +536,17 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
   modifier validateMultiWordResponseId(bytes32 requestId, bytes calldata data) {
     require(data.length >= 32, "Response must be > 32 bytes");
     bytes32 firstDataWord;
+    bytes32 offset;
     assembly {
-      // extract the first word from data
+      // retrieve the offset
       // functionSelector = 4
       // wordLength = 32
-      // dataArgumentOffset = 7 * wordLength
-      // funcSelector + dataArgumentOffset == 0xe4
-      firstDataWord := calldataload(0xe4)
+      // precedingArguments = 5
+      // dataArgumentOffset = precedingArguments * wordLength + funcSelector == 0xc4
+      offset := calldataload(0xc4)
+      // extract the first word from data
+      // funcSelector + dataArgumentOffset == expected to be 0xe4
+      firstDataWord := calldataload(add(0xa4, offset))
     }
     require(requestId == firstDataWord, "First word must be requestId");
     _;
