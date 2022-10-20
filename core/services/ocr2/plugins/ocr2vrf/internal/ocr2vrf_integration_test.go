@@ -205,7 +205,8 @@ func setupNodeOCR2(
 	config.Overrides.P2PV2ListenAddresses = p2paddresses
 	// Disables ocr spec validation so we can have fast polling for the test.
 	config.Overrides.Dev = null.BoolFrom(true)
-
+	//TODO something in this stack should do a p2pkey.MustNewV2XXXTestingOnly
+	// just rebase on the services change?
 	app := cltest.NewApplicationWithConfigAndKeyOnSimulatedBlockchain(t, config, b)
 	_, err := app.GetKeyStore().P2P().Create()
 	require.NoError(t, err)
